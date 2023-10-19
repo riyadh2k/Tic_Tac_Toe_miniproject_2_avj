@@ -27,38 +27,40 @@ public class TicTacToeController implements ActionListener {
         int x = Integer.parseInt(parts[0]);
         int y = Integer.parseInt(parts[1]);
 
-        if (model.isPlayerTurn() && model.getCell(x, y) == ' ') {
+        if (model.getCell(x, y) == ' ') {
             view.setButtonText(x, y, "X");
             model.setCell(x, y, 'X');
-            model.togglePlayerTurn();
 
-            int score = model.evaluate();
-            if (score == 10) {
+            int boardEval = model.evaluate();
+
+            if (boardEval == -10) {
                 view.showMessage("Player wins!");
+                resetGame();
+                return;
+            } else if (!model.isMovesLeft()) {
+                view.showMessage("It's a draw!");
                 resetGame();
                 return;
             }
 
-            if (!model.isPlayerTurn()) {
-                Point bestMove = model.findBestMove();
-                model.setCell(((Point) bestMove).x, bestMove.y, 'O');
-                view.setButtonText(bestMove.x, bestMove.y, "O");
-                model.togglePlayerTurn();
+            Point computerMove = model.findBestMove();
+            view.setButtonText(computerMove.x, computerMove.y, "O");
+            model.setCell(computerMove.x, computerMove.y, 'O');
 
-                score = model.evaluate();
-                if (score == -10) {
-                    view.showMessage("Computer wins!");
-                    resetGame();
-                    return;
-                }
+            boardEval = model.evaluate();
 
-                if (model.isMovesLeft()) {
-                    view.showMessage("It's a draw!");
-                    resetGame();
-                }
+            if (boardEval == 10) {
+                view.showMessage("Computer wins!");
+                resetGame();
+                return;
+            } else if (!model.isMovesLeft()) {
+                view.showMessage("It's a draw!");
+                resetGame();
             }
         }
     }
+
+
 
     private void resetGame() {
         model = new TicTacToeModel();
